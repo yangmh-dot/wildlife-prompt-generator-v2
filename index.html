@@ -3,38 +3,153 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 動物短片提示產生器 v2.7（真實多劇情版）</title>
+<title>AI 動物短片提示產生器 v2.9（真實多欄位＋重抽版）</title>
 <style>
-body {
-  font-family: "Noto Sans TC", sans-serif;
-  background: #0b0b0c;
-  color: #e9eef3;
-  margin: 0;
-  padding: 0;
+body{
+  font-family:"Noto Sans TC",sans-serif;
+  background:#0b0b0c;
+  color:#e9eef3;
+  margin:0;padding:0;
 }
-header {
-  background: #111316;
-  padding: 16px;
-  border-bottom: 1px solid #222;
+header{
+  background:#111316;
+  padding:16px;
+  border-bottom:1px solid #222;
 }
-h1 { margin: 0; font-size: 20px; }
-main { padding: 16px; max-width: 900px; margin: auto; }
-.card {
-  background: #15161a;
-  padding: 14px;
-  margin: 10px 0;
-  border-radius: 16px;
-  border: 1px solid #222;
+h1{margin:0;font-size:20px}
+main{padding:16px;max-width:1100px;margin:auto}
+button{
+  font-family:inherit;
+  background:linear-gradient(135deg,#0891b2,#2563eb);
+  color:#fff;border:none;border-radius:10px;
+  padding:8px 12px;cursor:pointer
 }
-button {
-  width: 100%;
-  font-family: inherit;
-  background: linear-gradient(135deg, #0891b2, #2563eb);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
-  cursor: pointer;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:12px;
+}
+.card{
+  background:#15161a;
+  border:1px solid #222;
+  border-radius:16px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+textarea{
+  flex:1;
+  resize:none;
+  width:100%;
+  height:300px;
+  background:#0f1114;
+  color:#e9eef3;
+  border:1px solid #2b3340;
+  border-radius:10px;
+  padding:10px;
+  margin-top:8px;
+}
+.actions{
+  display:flex;
+  justify-content:space-between;
+  margin-top:8px;
+}
+#genAll{
+  width:100%;
+  padding:10px;
+  margin-bottom:12px;
+}
+</style>
+</head>
+<body>
+<header><h1>🐾 AI 動物短片提示產生器 v2.9（真實多欄位＋重抽版）</h1></header>
+<main>
+<button id="genAll">⚡ 一鍵生成三組真實動物 Prompt</button>
+<div class="grid">
+  <div class="card">
+    <strong>劇情 1</strong>
+    <textarea id="out1" placeholder="Prompt 1..."></textarea>
+    <div class="actions">
+      <button onclick="regen('out1')">🔄 重新隨機</button>
+      <button onclick="copyPrompt('out1')">📋 複製</button>
+    </div>
+  </div>
+  <div class="card">
+    <strong>劇情 2</strong>
+    <textarea id="out2" placeholder="Prompt 2..."></textarea>
+    <div class="actions">
+      <button onclick="regen('out2')">🔄 重新隨機</button>
+      <button onclick="copyPrompt('out2')">📋 複製</button>
+    </div>
+  </div>
+  <div class="card">
+    <strong>劇情 3</strong>
+    <textarea id="out3" placeholder="Prompt 3..."></textarea>
+    <div class="actions">
+      <button onclick="regen('out3')">🔄 重新隨機</button>
+      <button onclick="copyPrompt('out3')">📋 複製</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<script>
+function sample(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+const templates=[
+`Morning sunlight glimmers on a backyard pool where a {PET} rests quietly. 
+From behind the bushes, a {PRED} approaches cautiously, the camera tracking low through flickering light. 
+The {PET} suddenly stands and barks; startled, the {PRED} slips on the wet tiles and scrambles away in panic. 
+Perfect for a 10-second vertical cinematic shot.`,
+
+`Soft daylight reflects on a calm riverbank where a {PET} drinks from the water. 
+A {PRED} prowls closer from the reeds, muscles tense as the camera pans low. 
+The {PET} splashes water suddenly; the {PRED} jumps back, loses balance, and tumbles into the river before bolting away dripping wet. 
+Perfect for a 10-second vertical cinematic shot.`,
+
+`Golden dust floats over a small farmyard where chickens wander near a fence. 
+A {PRED} sneaks in, eyes glowing, moving low as tension builds. 
+Suddenly the rooster flaps and crows; the {PRED} panics, trips over a bucket, and runs off as feathers fly in slow motion. 
+Perfect for a 10-second vertical cinematic shot.`,
+
+`Sunlight filters through the forest edge where a {PET} naps among leaves. 
+A {PRED} creeps along a branch, camera tracking upward through drifting dust. 
+The branch cracks; the {PRED} falls, hits the ground, and scrambles away as the {PET} stares in confusion. 
+Perfect for a 10-second vertical cinematic shot.`,
+
+`Wind blows across wide desert dunes as a {PRED} prowls confidently near a resting {PET}. 
+The sand shifts beneath its paws; the {PRED} slips, rolls down the dune, and lands in front of the startled {PET}, then flees awkwardly. 
+Perfect for a 10-second vertical cinematic shot.`
+];
+
+const preds=["jaguar","leopard","hyena","fox","coyote"];
+const pets=["golden retriever","husky","corgi","cat","rooster"];
+
+function makePrompt(){
+  let tpl=sample(templates);
+  const PRED=sample(preds),PET=sample(pets);
+  tpl=tpl.replaceAll("{PRED}",PRED).replaceAll("{PET}",PET);
+  return tpl.trim();
+}
+
+function regen(id){
+  document.getElementById(id).value=makePrompt();
+}
+
+document.getElementById("genAll").onclick=()=>{
+  regen('out1');regen('out2');regen('out3');
+};
+
+function copyPrompt(id){
+  const txt=document.getElementById(id);
+  txt.select(); txt.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(txt.value);
+  alert("已複製此段 Prompt！");
+}
+</script>
+</body>
+</html>  cursor: pointer;
   margin-top: 10px;
 }
 textarea {
