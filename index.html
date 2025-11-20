@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sora 2 極致寫實產生器 (V4)</title>
+    <title>Sora 2 高亮寫實雙語產生器 (V5)</title>
     <style>
         body {
-            font-family: 'Courier New', Courier, monospace; /* 改用等寬字體強調原始感 */
-            background-color: #0d0d0d;
-            color: #ccc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5; /* 改為淺色背景，代表明亮感 */
+            color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -18,110 +18,167 @@
             padding: 20px;
         }
         .container {
-            background-color: #1a1a1a;
+            background-color: #fff;
             padding: 30px;
-            border: 1px solid #333;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             max-width: 700px;
             width: 100%;
-            text-align: left;
         }
-        h1 { color: #00ff41; margin-bottom: 5px; font-size: 1.5em; text-transform: uppercase; }
-        p { color: #666; font-size: 0.8em; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 10px;}
-        
-        #output-box {
-            background-color: #000;
-            border: 1px solid #00ff41;
-            color: #00ff41;
-            padding: 20px;
-            font-size: 1.1em;
-            line-height: 1.4;
-            min-height: 180px;
-            margin-bottom: 20px;
-            white-space: pre-wrap; /* 保留換行 */
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+        h1 { 
+            color: #2c3e50; 
+            margin-bottom: 5px; 
+            text-align: center;
+            font-size: 1.5em;
         }
-
-        .btn {
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 10px 25px;
+        p.subtitle {
+            text-align: center;
+            color: #7f8c8d;
             font-size: 0.9em;
-            cursor: pointer;
-            margin-right: 10px;
-            font-family: inherit;
+            margin-bottom: 25px;
         }
-        .btn:hover { background-color: #444; border-color: #888; }
-        .btn-primary { background-color: #005c17; border-color: #008f24; }
-        .btn-primary:hover { background-color: #007a1f; }
 
-        .tag { font-size: 0.7em; color: #444; margin-top: 15px; text-align: center;}
+        /* 輸入框區域樣式 */
+        .prompt-group {
+            margin-bottom: 20px;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .prompt-header {
+            background-color: #f8f9fa;
+            padding: 8px 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #555;
+            border-bottom: 1px solid #e1e4e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .prompt-content {
+            padding: 15px;
+            font-size: 1.05em;
+            line-height: 1.5;
+            background-color: #fff;
+            min-height: 80px;
+            color: #2c3e50;
+        }
+
+        /* 按鈕樣式 */
+        .btn-area {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin: 0 5px;
+        }
+        .btn:hover { background-color: #0056b3; }
+        
+        .btn-copy {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff;
+            padding: 4px 10px;
+            font-size: 0.8em;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-copy:hover { background-color: #e7f1ff; }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Raw Footage Generator V4</h1>
-    <p>模擬真實器材拍攝效果：GoPro / Trail Cam / Handheld</p>
+    <h1>Bright Realism Generator V5</h1>
+    <p class="subtitle">自然光線 • 生活質感 • 雙語輸出</p>
     
-    <div id="output-box">系統就緒...</div>
-
-    <div>
-        <button class="btn btn-primary" onclick="generatePrompt()">🔴 生成錄影 Prompt</button>
-        <button class="btn" onclick="copyToClipboard()">複製內容</button>
+    <div class="prompt-group">
+        <div class="prompt-header">
+            ENGLISH PROMPT
+            <button class="btn-copy" onclick="copyText('en-out')">Copy English</button>
+        </div>
+        <div class="prompt-content" id="en-out">Generating...</div>
     </div>
-    <div class="tag">Keywords: Raw, Handheld, ISO noise, Imperfect focus</div>
+
+    <div class="prompt-group">
+        <div class="prompt-header">
+            中文提示詞
+            <button class="btn-copy" onclick="copyText('zh-out')">複製中文</button>
+        </div>
+        <div class="prompt-content" id="zh-out">生成中...</div>
+    </div>
+
+    <div class="btn-area">
+        <button class="btn" onclick="generatePrompt()">✨ 生成新情節 (Generate)</button>
+    </div>
 </div>
 
 <script>
-    // 1. 攝影風格：決定畫面的「質感」
-    const cameraStyles = [
-        "Handheld documentary footage with slight camera shake.", 
-        "Low-angle GoPro footage placed on the ground.", 
-        "Hidden trail camera footage (night vision style if dark).", 
-        "Telephoto zoom lens shot through bushes, slight focus hunting.", 
-        "High-resolution amateur wildlife photography style."
+    // 為了做雙語對照，我們使用物件陣列
+    
+    const lighting = [
+        {en: "Bright sunny day, clear blue sky,", zh: "陽光明媚的晴天，湛藍的天空，"},
+        {en: "Soft morning sunlight filtering through trees,", zh: "柔和的晨光穿過樹林，"},
+        {en: "Golden hour lighting, warm and natural,", zh: "黃金時刻的光線，溫暖而自然，"},
+        {en: "High noon, strong contrast shadows,", zh: "正午時分，對比強烈的陰影，"},
+        {en: "Overcast but bright daylight,", zh: "多雲但明亮的白晝光線，"}
     ];
 
-    // 2. 動物狀態：加入不完美的細節
     const animals = [
-        "a scarred, dirty Bengal Tiger", 
-        "a wet, matted Grey Wolf", 
-        "a nervous, twitching Red Fox", 
-        "a heavy breathing, muddy Wild Boar", 
-        "a dusty, prowling Leopard"
+        {en: "a healthy Bengal Tiger", zh: "一隻健康的孟加拉虎"},
+        {en: "a sleek Cheetah", zh: "一隻毛色光亮的獵豹"},
+        {en: "a fluffy Red Fox", zh: "一隻毛茸茸的赤狐"},
+        {en: "a large Brown Bear", zh: "一隻巨大的棕熊"},
+        {en: "a cautious Grey Wolf", zh: "一隻謹慎的灰狼"},
+        {en: "a wild Boar", zh: "一隻野豬"}
     ];
 
-    // 3. 環境與光影：強調自然與雜亂
     const environments = [
-        "in a dense thicket with harsh, dappled sunlight", 
-        "on a gray, overcast day in a muddy clearing", 
-        "in a dusty dry riverbed with flying insects", 
-        "under the heavy rain in a dark forest"
+        {en: "walking in a green grassy field", zh: "走在翠綠的草地上"},
+        {en: "standing on a dry dirt path", zh: "站在乾燥的泥土小徑上"},
+        {en: "moving through a bamboo forest", zh: "穿過一片竹林"},
+        {en: "exploring a rocky river bank", zh: "在佈滿岩石的河岸邊探索"},
+        {en: "prowling in a quiet backyard garden", zh: "在安靜的後花園裡徘徊"} // 加入一點生活感
     ];
 
-    // 4. 陷阱：去精緻化，強調危險與生鏽
     const traps = [
-        "an old, rusted mechanical trap half-buried in dirt",
-        "a crude wooden spike trap camouflaged with dead leaves",
-        "a taut wire snare hidden in the tall grass",
-        "a heavy metal cage with peeling paint and rust"
+        {en: "a clearly visible wooden box trap", zh: "一個清晰可見的木製箱型陷阱"},
+        {en: "a shiny metal cage trap", zh: "一個閃亮的金屬籠子陷阱"},
+        {en: "a simple rope snare on the ground", zh: "地面上一個簡單的繩索套索"},
+        {en: "a large animal carrier with the door open", zh: "一個門開著的大型動物運輸籠"}, // 更生活化
+        {en: "a heavy iron trap anchored to a stake", zh: "一個固定在樁上的重型鐵製陷阱"}
     ];
 
-    // 5. 動作：具體的物理互動
-    const interactions = [
-        "bites the bait, pulling the string taut instantly",
-        "steps on the edge, causing the mechanism to shift and creak",
-        "noses the bait, accidentally bumping the trigger",
-        "paws at the meat, making the heavy trap shake visibly"
+    const baits = [
+        {en: "a fresh piece of steak", zh: "一塊新鮮的牛排"},
+        {en: "a whole raw chicken", zh: "一隻完整的生雞"},
+        {en: "a pile of dog food", zh: "一堆狗飼料"}, // 生活化
+        {en: "a hanging piece of meat", zh: "一塊懸掛著的肉"}
     ];
 
-    // 6. 結尾修飾詞：強制寫實
-    const realifiers = [
-        "Raw footage, natural lighting, high ISO noise, no CGI, authentic texture.",
-        "4k video, sharp details, dust particles in air, realistic physics.",
-        "Documentary style, neutral color grading, harsh shadows, hyper-realistic.",
-        "Found footage style, believable movement, unpolished look."
+    const actions = [
+        {en: "steps on the trigger plate, causing it to click", zh: "踩到了觸發板，發出喀嚓一聲"},
+        {en: "bites the bait, pulling the string tight", zh: "咬住誘餌，將繩子瞬間拉緊"},
+        {en: "nudges the trap door, making it shake", zh: "輕推陷阱門，使其晃動"},
+        {en: "grabs the meat, triggering the mechanism", zh: "抓取肉塊，觸發了機關"}
+    ];
+
+    // 結尾強調清晰度
+    const styles = [
+        {en: "4k video, sharp focus, realistic colors, documentary footage.", zh: "4k 影片，對焦清晰，色彩寫實，紀錄片風格。"},
+        {en: "High definition, GoPro hero 10, clear visibility, real life texture.", zh: "高畫質，GoPro Hero 10 風格，視野清晰，真實生活質感。"},
+        {en: "Telephoto lens, shallow depth of field, crystal clear image.", zh: "長焦鏡頭，淺景深，畫面晶瑩剔透。"}
     ];
 
     function getRandom(arr) {
@@ -129,26 +186,33 @@
     }
 
     function generatePrompt() {
-        const camera = getRandom(cameraStyles);
-        const animal = getRandom(animals);
-        const env = getRandom(environments);
-        const trap = getRandom(traps);
-        const action = getRandom(interactions);
-        const realifier = getRandom(realifiers);
+        const l = getRandom(lighting);
+        const a = getRandom(animals);
+        const e = getRandom(environments);
+        const t = getRandom(traps);
+        const b = getRandom(baits);
+        const act = getRandom(actions);
+        const s = getRandom(styles);
 
-        // 組合邏輯：攝影機 -> 環境與主體 -> 陷阱位置 -> 互動 -> 寫實修飾
-        const prompt = `${camera} ${animal} is moving ${env}. Directly in front is ${trap}, baited with raw meat. Close up shot. The animal ${action}. ${realifier}`;
+        // 組合英文
+        const enText = `${l.en} ${a.en} is ${e.en}. In front of it is ${t.en}, baited with ${b.en}. The animal ${act.en}. ${s.en}`;
         
-        document.getElementById('output-box').innerText = prompt;
+        // 組合中文
+        const zhText = `${l.zh} ${a.zh}正${e.zh}。在它面前是${t.zh}，放著${b.zh}作為誘餌。動物${act.zh}。${s.zh}`;
+
+        document.getElementById('en-out').innerText = enText;
+        document.getElementById('zh-out').innerText = zhText;
     }
 
-    function copyToClipboard() {
-        const text = document.getElementById('output-box').innerText;
+    function copyText(elementId) {
+        const text = document.getElementById(elementId).innerText;
         navigator.clipboard.writeText(text).then(() => {
-            alert("已複製！貼上到 Sora 試試看。");
+            // 簡單的回饋效果
+            alert("Copied! (已複製)");
         });
     }
 
+    // 初始執行
     generatePrompt();
 </script>
 
