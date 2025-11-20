@@ -1,131 +1,680 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 動物短片提示產生器 v3.2（Viral Title Mode）</title>
-<style>
-body{font-family:"Noto Sans TC",sans-serif;background:#0b0b0c;color:#e9eef3;margin:0}
-header{background:#111316;padding:16px;border-bottom:1px solid #222}
-h1{margin:0;font-size:20px}
-main{padding:16px;max-width:1200px;margin:auto}
-.btn{background:linear-gradient(135deg,#0891b2,#2563eb);color:#fff;border:none;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600;width:100%}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
-.card{background:#15161a;border:1px solid #222;border-radius:16px;padding:12px;display:flex;flex-direction:column}
-.card h3{margin:0 0 8px 0;font-size:16px}
-textarea{flex:1;min-height:220px;background:#0f1114;color:#e9eef3;border:1px solid #2b3340;border-radius:10px;padding:10px;resize:none}
-.row{display:flex;gap:8px;margin-top:8px}
-.sm{flex:1;background:#222733}
-ul{margin:6px 0 0 14px;padding:0;font-size:13px;color:#a8bad1;line-height:1.45}
-ul li{margin-bottom:4px;list-style:"🔥 "}
-.meta{font-size:12px;color:#8fa2ba;margin-top:4px}
-</style>
+  <meta charset="UTF-8" />
+  <title>動物陷阱情節 Sora Prompt 產生器（爆點版）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #f5f5f5;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #b0b0b0;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: #1b1b1b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+    }
+    .section-title {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-title span {
+      font-size: 0.8rem;
+      color: #888;
+      font-weight: normal;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .field {
+      flex: 1 1 150px;
+      min-width: 130px;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: #cccccc;
+    }
+    select,
+    button,
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #101010;
+      color: #f5f5f5;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    select:focus,
+    textarea:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 1px;
+      border-color: transparent;
+    }
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    .radio-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .radio-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: #101010;
+      border-radius: 999px;
+      border: 1px solid #333;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .radio-pill input {
+      accent-color: #3b82f6;
+    }
+    .radio-pill.active {
+      border-color: #3b82f6;
+      background: #111827;
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex: 1 1 120px;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-secondary {
+      background: #262626;
+      color: #f5f5f5;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #555;
+      color: #e5e5e5;
+    }
+    .footer-note {
+      font-size: 0.75rem;
+      color: #777;
+      text-align: center;
+      margin-top: 8px;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.4rem;
+      }
+      .card {
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
-<body>
-<header><h1>📹 AI 動物短片提示產生器 v3.2（Viral Title Mode）</h1></header>
-<main>
-<button id="genAll" class="btn">⚡ 一鍵生成三組「真實爆紅感」Sora2 Prompt + Shorts 標題</button>
 
-<div class="grid">
-  <div class="card">
-    <h3>🎞️ 劇情 1</h3>
-    <textarea id="out1"></textarea>
-    <ul id="titles1"></ul>
-    <div class="row"><button class="btn sm" onclick="copyOne('out1','titles1')">📋 複製此段＋標題</button></div>
+<body>
+  <div class="container">
+    <h1>動物陷阱情節 Sora Prompt 產生器（爆點版）</h1>
+    <div class="subtitle">
+      中文操作介面 · 英文 Prompt / 中文描述詞 / 雙語輸出（10 秒 · 9:16 · 無慢動作 · 可循環 · 內建爆點）
+    </div>
+
+    <!-- 動物分類 -->
+    <div class="card">
+      <div class="section-title">
+        動物分類
+        <span>先選類型，再選具體動物</span>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>動物類型</label>
+          <div class="radio-group" id="animalTypeGroup">
+            <label class="radio-pill active">
+              <input type="radio" name="animalType" value="ferocious" checked />
+              凶猛動物
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="animalType" value="pet" />
+              貓狗老鼠
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label>動物（可留空交給「隨機」）</label>
+          <select id="animalSelect"></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 場景與陷阱 -->
+    <div class="card">
+      <div class="section-title">
+        場景與陷阱設計
+        <span>會依動物類型自動切換合理選項</span>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>場景</label>
+          <select id="sceneSelect"></select>
+        </div>
+        <div class="field">
+          <label>陷阱類型</label>
+          <select id="trapSelect"></select>
+        </div>
+        <div class="field">
+          <label>情緒氛圍</label>
+          <select id="moodSelect">
+            <option value="">（隨機）</option>
+            <option value="tense and thrilling">緊張刺激</option>
+            <option value="darkly humorous yet dangerous">黑色幽默又帶危險</option>
+            <option value="playful but risky">調皮但有風險</option>
+            <option value="suspenseful and cinematic">懸疑電影感</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 視覺風格 -->
+    <div class="card">
+      <div class="section-title">
+        拍攝與畫面風格
+        <span>自動幫你寫進描述</span>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>鏡頭風格</label>
+          <select id="cameraSelect">
+            <option value="">（隨機）</option>
+            <option value="dynamic handheld shots with close-ups on the animal's face">動態手持特寫</option>
+            <option value="smooth tracking shots following the animal's movements">平滑跟拍鏡頭</option>
+            <option value="cinematic close-ups on the paws and the bait">爪子與誘餌特寫</option>
+            <option value="slight wide-angle shot showing the full trap and environment">廣角全景構圖</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>畫面細節</label>
+          <select id="detailSelect">
+            <option value="">（隨機）</option>
+            <option value="hyper-realistic textures, detailed fur, realistic lighting">超寫實毛髮與光影</option>
+            <option value="4K cinematic look, shallow depth of field, filmic contrast">4K 電影感、淺景深</option>
+            <option value="natural daylight, soft shadows, dust particles in the air">自然日光與空氣微塵</option>
+            <option value="dramatic lighting emphasizing the trap and the animal's eyes">強調陷阱與眼神的戲劇光</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>影片長度與比例</label>
+          <select disabled>
+            <option>10 秒 · 9:16 · 無慢動作 · 可首尾循環</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 輸出設定 & 結果 -->
+    <div class="card">
+      <div class="section-title">
+        輸出設定與結果
+        <span>可選英文 / 中文 / 雙語，已內建「爆點」橋段</span>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>輸出語言</label>
+          <select id="langSelect">
+            <option value="en">只輸出英文 Prompt</option>
+            <option value="zh">只輸出中文描述詞</option>
+            <option value="both">中英雙語一起輸出</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="randomBtn">🎲 隨機全部</button>
+        <button class="btn btn-primary" id="generateBtn">⚙️ 產生描述</button>
+      </div>
+
+      <textarea id="promptOutput" placeholder="按下「產生描述」後會顯示在這裡"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-outline" id="copyBtn">📋 一鍵複製</button>
+      </div>
+      <div class="footer-note">
+        「爆點版」會自動加入一個真實、合理但有張力的關鍵瞬間（差點掉下去、箱子差點蓋住等），方便做高完播 Shorts。
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Made for GitHub Pages · UI in Chinese · Output: English / Chinese / Both · Highlight Beats Included
+    </div>
   </div>
-  <div class="card">
-    <h3>🎞️ 劇情 2</h3>
-    <textarea id="out2"></textarea>
-    <ul id="titles2"></ul>
-    <div class="row"><button class="btn sm" onclick="copyOne('out2','titles2')">📋 複製此段＋標題</button></div>
-  </div>
-  <div class="card">
-    <h3>🎞️ 劇情 3</h3>
-    <textarea id="out3"></textarea>
-    <ul id="titles3"></ul>
-    <div class="row"><button class="btn sm" onclick="copyOne('out3','titles3')">📋 複製此段＋標題</button></div>
-  </div>
-</div>
-</main>
 
 <script>
-const animals = {
-  predator:["coyote","fox","raccoon","bobcat","deer","black bear"],
-  pet:["dog","corgi","husky","golden retriever","cat","rooster"]
+/* ====== 資料 ====== */
+
+const animalOptions = {
+  ferocious: [
+    { key: "tiger", label: "老虎", en: "a tiger" },
+    { key: "leopard", label: "花豹", en: "a leopard" },
+    { key: "cheetah", label: "獵豹", en: "a cheetah" },
+    { key: "lion", label: "獅子", en: "a lion" },
+    { key: "snow_leopard", label: "雪豹", en: "a snow leopard" }
+  ],
+  pet: [
+    { key: "house_cat", label: "家貓", en: "a house cat" },
+    { key: "stray_cat", label: "流浪貓", en: "a stray cat" },
+    { key: "small_dog", label: "小型狗狗", en: "a small dog" },
+    { key: "big_dog", label: "中大型狗狗", en: "a large dog" },
+    { key: "mouse", label: "小老鼠", en: "a small mouse" }
+  ]
 };
-const tones=["Dramatic","Epic","Tense"];
-const triggers=["dog barks","metal barrel falls","bird flaps suddenly","water splashes","screen door bangs"];
-const scenes=[
-  {place:"backyard security camera","emoji":"🏡"},
-  {place:"poolside patio","emoji":"🏊"},
-  {place:"driveway cam","emoji":"🚗"},
-  {place:"farmyard","emoji":"🐓"},
-  {place:"forest edge","emoji":"🌲"}
-];
-const reactions=[
-  "the predator jumps back and slips like crazy",
-  "the animal panics, sliding off the patio",
-  "it freezes for a second then bolts away in fear",
-  "the moment looks totally real, caught by accident"
-];
-const captions=[
-  "camera caught this",
-  "caught on cam",
-  "looks too real 😂",
-  "unbelievable moment",
-  "nobody would believe this"
-];
 
-function pick(a){return a[Math.floor(Math.random()*a.length)]}
+const sceneOptions = {
+  ferocious: [
+    { value: "a dense forest", label: "茂密森林" },
+    { value: "a wide savanna plain", label: "寬廣草原" },
+    { value: "an open desert with dry ground", label: "開闊乾燥沙漠" },
+    { value: "a rocky canyon", label: "岩石峽谷" },
+    { value: "a snowy mountain valley", label: "雪地山谷" },
+    { value: "a dry woodland area", label: "乾燥林地" },
+    { value: "a riverside bush area", label: "河岸叢林帶" }
+  ],
+  pet: [
+    { value: "a bright cozy living room", label: "明亮溫暖的客廳" },
+    { value: "an apartment balcony with potted plants", label: "有盆栽的公寓陽台" },
+    { value: "a small backyard garden", label: "小小後院花園" },
+    { value: "a city park lawn", label: "都市公園草地" },
+    { value: "a clean kitchen floor", label: "乾淨的廚房地板" },
+    { value: "a quiet alleyway corner", label: "安靜巷口角落" },
+    { value: "a wooden deck patio", label: "木平台庭院" }
+  ]
+};
 
-function makePrompt(){
-  const tone=pick(tones);
-  const scene=pick(scenes);
-  const pred=pick(animals.predator);
-  const pet=pick(animals.pet);
-  const trig=pick(triggers);
-  const react=pick(reactions);
-  const cap=pick(captions);
+const trapOptions = {
+  ferocious: [
+    {
+      value: "a deep pit with rough wooden stakes at the bottom",
+      label: "底部有粗木樁的深坑"
+    },
+    {
+      value: "a fake ground that suddenly collapses into a hidden hole",
+      label: "會塌陷的假地板深洞"
+    },
+    {
+      value: "a hanging meat lure above a dangerous pit",
+      label: "吊在危險深坑上方的肉誘餌"
+    },
+    {
+      value: "a rotating log trap lined with blunt wooden stakes",
+      label: "佈滿鈍木柱的旋轉原木陷阱"
+    },
+    {
+      value: "a meat bait tied above a hollow tree stump",
+      label: "綁在空心樹樁上方的肉誘餌"
+    },
+    {
+      value: "a wobbling wooden platform placed over a pit",
+      label: "架在坑上方會晃動的木板陷阱"
+    }
+  ],
+  pet: [
+    {
+      value: "a piece of cheese hanging above a small cardboard box trap",
+      label: "吊在小紙箱陷阱上方的起司"
+    },
+    {
+      value: "a wobbling cardboard platform with cheese on top",
+      label: "上面放起司、會晃動的紙板平台"
+    },
+    {
+      value: "a piece of cheese placed right beside a small wall hole",
+      label: "放在牆角小洞旁邊的起司"
+    },
+    {
+      value: "a transparent cup trap held up by a string with cheese inside",
+      label: "裡面有起司、用繩子撐起的透明杯陷阱"
+    },
+    {
+      value: "a very shallow toy-like pit with cheese at the center",
+      label: "中央放起司的淺淺玩具陷阱"
+    },
+    {
+      value: "a piece of cheese tied to a swinging string like a toy",
+      label: "掛在搖晃繩子上的起司"
+    }
+  ]
+};
 
-  const intro=`${scene.emoji} ${cap.toUpperCase()} — a ${pred} sneaks near a ${pet} in someone's ${scene.place}.`;
-  const mid=`Then ${trig}, and suddenly ${react}.`;
-  const end=`${tone} tone, single take, handheld phone footage vibe, no cuts. Looks totally real.`;
+/* 爆點選項：真實但有張力，不離譜 */
+const highlightOptions = {
+  ferocious: {
+    en: [
+      "At one tense moment, a small slide of dirt makes the animal almost slip toward the edge of the pit, but it quickly regains its balance.",
+      "The trap suddenly shifts a little and one rough wooden stake scrapes the bait, making a sharp sound that startles the animal.",
+      "The hanging meat lure unexpectedly swings closer to the animal's face, making it flinch and jump back in surprise.",
+      "The ground under the animal's paw sinks just a little, hinting that the fake floor could fully collapse if it steps any further."
+    ],
+    zh: [
+      "其中一個緊張的瞬間，地面突然有一小塊土滑落，牠差點滑向深坑邊緣，但立刻穩住身體。",
+      "陷阱突然輕微晃動，其中一根粗木樁擦過誘餌發出輕微聲響，把牠嚇了一跳。",
+      "吊著的肉突然晃得更靠近牠的臉，牠瞬間嚇到往後跳一步，耳朵完全豎起。",
+      "牠踩到的地面輕微下陷，好像再往前一步整片地板就會塌下去，讓牠瞬間停住不敢再前進。"
+    ]
+  },
+  pet: {
+    en: [
+      "At the highlight moment, the cardboard box almost drops down but stops halfway, making the animal jump back in surprise.",
+      "The transparent cup suddenly wobbles hard and almost falls, clinking softly as the animal quickly retreats.",
+      "The cheese swings on the string and lightly taps the animal's nose, making it blink and pull its head back.",
+      "A tiny piece of cardboard or dust suddenly falls from the trap, making the animal freeze for a moment before acting casual again."
+    ],
+    zh: [
+      "爆點瞬間，紙箱差點整個掉下來，但在半空中停住，嚇得牠整個往後跳。",
+      "透明杯突然劇烈晃動，幾乎要整個倒下來發出輕微聲響，牠趕緊往後退一步。",
+      "掛在繩子上的起司晃動時輕輕碰到牠的鼻子，牠瞬間眨眼並把頭往後縮，看起來又驚又好奇。",
+      "陷阱上的一小片紙屑或灰塵突然掉落，讓牠嚇了一小跳，整個身體瞬間僵住一秒。"
+    ]
+  }
+};
 
-  return {prompt:`${intro}\n${mid}\n${end}`,pred,pet};
+/* ====== 工具函式 ====== */
+
+function randomFromArray(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function makeTitles(pred,pet){
-  const funny=[
-    `${pred.charAt(0).toUpperCase()+pred.slice(1)} panics after one bark 😂`,
-    `${pet.charAt(0).toUpperCase()+pet.slice(1)} didn’t even move — the ${pred} slipped 😭`,
-    `They both freaked out 💀`,
-  ];
-  const real=[
-    `Real backyard footage? You decide.`,
-    `Caught on camera — too perfect to be fake.`
-  ];
-  return [...funny,...real];
+function getCurrentAnimalType() {
+  const radios = document.querySelectorAll("input[name='animalType']");
+  for (const r of radios) if (r.checked) return r.value;
+  return "ferocious";
 }
 
-function fillCard(num){
-  const {prompt,pred,pet}=makePrompt();
-  const titles=makeTitles(pred,pet);
-  document.getElementById(`out${num}`).value=prompt;
-  document.getElementById(`titles${num}`).innerHTML=titles.map(t=>`<li>${t}</li>`).join("");
+function populateAnimals(type) {
+  const sel = document.getElementById("animalSelect");
+  sel.innerHTML = '<option value="">（隨機）</option>';
+  (animalOptions[type] || []).forEach((a) => {
+    sel.innerHTML += `<option value="${a.key}">${a.label}</option>`;
+  });
 }
 
-function generateAll(){
-  fillCard(1); fillCard(2); fillCard(3);
+function populateScenes(type) {
+  const sel = document.getElementById("sceneSelect");
+  sel.innerHTML = '<option value="">（隨機）</option>';
+  (sceneOptions[type] || []).forEach((s) => {
+    sel.innerHTML += `<option value="${s.value}">${s.label}</option>`;
+  });
 }
 
-function copyOne(tid,lid){
-  const text=document.getElementById(tid).value;
-  const titles=document.getElementById(lid).innerText;
-  navigator.clipboard.writeText(text+"\n\nTitles:\n"+titles);
-  alert("已複製 Prompt＋標題！");
+function populateTraps(type) {
+  const sel = document.getElementById("trapSelect");
+  sel.innerHTML = '<option value="">（隨機）</option>';
+  (trapOptions[type] || []).forEach((t) => {
+    sel.innerHTML += `<option value="${t.value}">${t.label}</option>`;
+  });
 }
 
-document.getElementById("genAll").onclick=generateAll;
+function getSelectedAnimalObj() {
+  const type = getCurrentAnimalType();
+  const sel = document.getElementById("animalSelect");
+  const key = sel.value;
+  const list = animalOptions[type] || [];
+  if (!list.length) return { en: "", label: "" };
+  if (!key) return randomFromArray(list);
+  return list.find((x) => x.key === key) || randomFromArray(list);
+}
+
+function ensureValue(selectEl) {
+  if (selectEl.value) return selectEl.value;
+  const valid = [...selectEl.options].map((o) => o.value).filter((v) => v);
+  return valid.length ? randomFromArray(valid) : "";
+}
+
+function ensureLabel(selectEl) {
+  if (selectEl.value) {
+    const opt = [...selectEl.options].find((o) => o.value === selectEl.value);
+    return opt ? opt.textContent : "";
+  }
+  const validOpts = [...selectEl.options].filter((o) => o.value);
+  if (!validOpts.length) return "";
+  return randomFromArray(validOpts).textContent;
+}
+
+/* ====== 英文 Prompt（含爆點） ====== */
+
+function buildPromptEn() {
+  const type = getCurrentAnimalType();
+  const animalObj = getSelectedAnimalObj();
+  const animal = animalObj.en;
+
+  const scene = ensureValue(document.getElementById("sceneSelect"));
+  const trap = ensureValue(document.getElementById("trapSelect"));
+  const mood = ensureValue(document.getElementById("moodSelect"));
+  const camera = ensureValue(document.getElementById("cameraSelect"));
+  const detail = ensureValue(document.getElementById("detailSelect"));
+
+  const bait = type === "ferocious"
+    ? "a piece of meat lure"
+    : "a piece of cheese bait";
+
+  const categoryPhrase = type === "ferocious"
+    ? "a dangerous wild predator"
+    : "a domestic animal acting brave and curious";
+
+  const hEnArr = highlightOptions[type]?.en || [];
+  const hEn = hEnArr.length ? randomFromArray(hEnArr) : "";
+
+  return `
+A 10-second 9:16 hyper-realistic video of ${animal} in ${scene}, carefully trying to grab ${bait} that is part of ${trap}.
+The animal is ${categoryPhrase}, moving slowly and cautiously at first, then suddenly making quick risky moves with its paw to reach the bait without getting caught by the trap.
+${hEn}
+Camera style: ${camera}. Visual style: ${detail}. Overall mood is ${mood}.
+Natural realtime motion, no slow motion, no time warp.
+The scene focuses on the animal's intelligence, hesitation, and near-miss highlight moments with the trap and the bait.
+Designed as a seamless loop, so the final frame can connect perfectly back to the first frame, ideal for vertical short video.
+  `.trim();
+}
+
+/* ====== 中文描述詞（爆點版，不離譜） ====== */
+
+function buildPromptZh() {
+  const type = getCurrentAnimalType();
+  const animalObj = getSelectedAnimalObj();
+  const animalZh = animalObj.label;
+
+  const sceneZh = ensureLabel(document.getElementById("sceneSelect"));
+  const trapZh = ensureLabel(document.getElementById("trapSelect"));
+
+  const moodOpt = document.getElementById("moodSelect");
+  const moodZh = ensureLabel(moodOpt) || "略帶緊張的氛圍";
+
+  const cameraOpt = document.getElementById("cameraSelect");
+  const cameraZh = ensureLabel(cameraOpt) || "平穩自然的鏡頭運動";
+
+  const detailOpt = document.getElementById("detailSelect");
+  const detailZh = ensureLabel(detailOpt) || "真實的光線與毛髮細節";
+
+  const hZhArr = highlightOptions[type]?.zh || [];
+  const hZh = hZhArr.length ? randomFromArray(hZhArr) : "";
+
+  if (type === "ferocious") {
+    // 凶猛動物：野外爆點版
+    return `
+一段 10 秒、9:16 的真實風格影片。
+場景在${sceneZh}，環境自然，畫面${detailZh}。
+
+一隻${animalZh}小心地接近一個陷阱，
+陷阱的設計是：${trapZh}。
+地面有些灰塵與細小雜草，整體看起來接近真實野外環境。
+
+牠先停下來觀察，耳朵微微抖動，鼻子嗅聞空氣和氣味。
+接著伸出一隻前腳，試探性地輕輕碰一下誘餌或陷阱邊緣，
+陷阱只出現非常輕微的晃動，沒有誇張的爆炸或劇烈動作。
+
+${hZh}
+
+${animalZh}被這個瞬間嚇到，往後退半步，身體保持低姿態，眼神高度專注，
+看得出來牠還在評估要不要再靠近一次。
+
+鏡頭以${cameraZh}為主，不過度晃動，不做誇張運鏡，
+整體氛圍是${moodZh}，但不血腥、不恐怖，也不卡通化。
+
+最後一秒的畫面構圖和開頭相似，
+方便剪輯成可以首尾相接的循環短片。
+    `.trim();
+  } else {
+    // 貓狗老鼠：家居爆點版
+    return `
+一段 10 秒、9:16 的真實風格影片。
+場景在${sceneZh}，光線自然，環境接近日常生活空間。
+
+畫面中擺放著一個簡單的小陷阱：
+例如${trapZh}，看起來像是人類設計的小機關玩具，
+不會造成真實傷害，整體偏向有趣、可愛。
+
+一隻${animalZh}慢慢靠近起司誘餌，
+牠先在旁邊停下來觀察幾秒，鼻子聞一聞，耳朵微微晃動。
+接著用前腳或鼻子輕輕碰一下起司或陷阱邊緣，
+紙箱、杯子或紙板開始有一點點晃動或輕微移動。
+
+${hZh}
+
+${animalZh}被嚇到之後往後退半步，但很快又重新靠近一點點，
+表現出真實、自然的猶豫與好奇心，而不是誇張的搞笑演出。
+
+鏡頭以${cameraZh}為主，${detailZh}，
+整體氛圍自然、溫和，略帶${moodZh}，不誇張、不動漫化。
+
+最後一秒畫面回到和開頭相似的位置，
+方便剪輯成可以首尾相接的循環短片。
+    `.trim();
+  }
+}
+
+/* ====== 事件綁定與主流程 ====== */
+
+document.getElementById("animalTypeGroup").addEventListener("change", () => {
+  const type = getCurrentAnimalType();
+  document.querySelectorAll(".radio-pill").forEach((pill) => {
+    const input = pill.querySelector("input");
+    pill.classList.toggle("active", input.checked);
+  });
+  populateAnimals(type);
+  populateScenes(type);
+  populateTraps(type);
+});
+
+document.getElementById("randomBtn").addEventListener("click", () => {
+  const radios = [...document.querySelectorAll("input[name='animalType']")];
+  randomFromArray(radios).checked = true;
+
+  const type = getCurrentAnimalType();
+  document.querySelectorAll(".radio-pill").forEach((pill) => {
+    const input = pill.querySelector("input");
+    pill.classList.toggle("active", input.checked);
+  });
+
+  populateAnimals(type);
+  populateScenes(type);
+  populateTraps(type);
+
+  const animalSel = document.getElementById("animalSelect");
+  const animalOpts = [...animalSel.options].filter((o) => o.value);
+  if (animalOpts.length) randomFromArray(animalOpts).selected = true;
+
+  document.getElementById("sceneSelect").value = "";
+  document.getElementById("trapSelect").value = "";
+  document.getElementById("moodSelect").value = "";
+  document.getElementById("cameraSelect").value = "";
+  document.getElementById("detailSelect").value = "";
+});
+
+document.getElementById("generateBtn").addEventListener("click", () => {
+  const lang = document.getElementById("langSelect").value;
+  let output = "";
+
+  if (lang === "en") {
+    output = buildPromptEn();
+  } else if (lang === "zh") {
+    output = buildPromptZh();
+  } else {
+    const en = buildPromptEn();
+    const zh = buildPromptZh();
+    output = en + "\n\n--------------------\n\n" + zh;
+  }
+
+  document.getElementById("promptOutput").value = output;
+});
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const text = document.getElementById("promptOutput").value.trim();
+  if (!text) {
+    alert("目前沒有內容，可以先按「產生描述」。");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("已複製內容，可以貼到 Sora2 或其他工具。");
+  } catch (e) {
+    alert("無法自動複製，請手動長按選取文字。");
+  }
+});
+
+/* ====== 初始化 ====== */
+(function init() {
+  const defaultType = "ferocious";
+  populateAnimals(defaultType);
+  populateScenes(defaultType);
+  populateTraps(defaultType);
+})();
 </script>
+
 </body>
 </html>
